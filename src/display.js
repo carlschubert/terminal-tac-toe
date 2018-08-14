@@ -1,3 +1,7 @@
+const chalk = require('chalk');
+const utils = require('../src/utils.js');
+const config = require('../src/config.js');
+
 const displayState = (state) => {
 
     console.log(chalk.bold.red('-----------------'));

@@ -42,11 +42,9 @@ const getInput = (state, cb) => {
     console.log(chalk.bold.white(`${state.turn}'s turn`));
     console.log(chalk.bold.white('Enter your move i.e. 1,1'));
 
-    process.stdin.resume();
-
     process.stdin.setEncoding('utf8');
 
-    process.stdin.once('data', (text) => {
+    process.stdin.once('data', text => {
 
         const input = parseText(text);
 
@@ -88,7 +86,7 @@ const isEmptySquare = (input, state) => {
     return state.board[index] === '-';
 }
 
-const parseText = (text) => {
+const parseText = text => {
     return text.replace(/(\r\n|\n|\r)/gm, "").split(',').reverse().map(i => parseInt(i, 10) - 1);
 }
 
