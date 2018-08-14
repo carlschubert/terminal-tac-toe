@@ -4,8 +4,17 @@
   "description": "A terminal tic tac toe game",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "start": "node src/runner.js",
+    "test": "mocha --compilers js:babel-core"
   },
   "author": "Carl Schubert",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^2.4.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  }
 }
