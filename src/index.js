@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const inquirer = require('inquirer');
 const checker = require('../src/checker.js');
 const config = require('../src/config');
 const utils = require('../src/utils.js');
@@ -15,19 +16,15 @@ const play = (state) => {
 
         display.displayWinner(state.turn === 'X' ? 'O' : 'X');
 
-        process.exit();
-
     } else if (isDraw(state.board)) {
 
         display.displayDraw();
 
-        process.exit();
-
     } else {
 
-        getInput(state, input => {
+        return getInput(state).then(input => {
 
-            play(advanceTurn(addInput(state, input)));
+            return play(advanceTurn(addInput(state, input)));
 
         });
 
@@ -37,32 +34,43 @@ const play = (state) => {
 
 module.exports.play = play;
 
-const getInput = (state, cb) => {
+const getInput = (state) => {
 
-    console.log(chalk.bold.white(`${state.turn}'s turn`));
-    console.log(chalk.bold.white('Enter your move i.e. 1,1'));
+    console.log(chalk.bold.white('Enter your move in an X,Y format i.e. 1,1'));
 
-    process.stdin.setEncoding('utf8');
+    const questions = [
+        {
+            type: 'input',
+            name: 'coord',
+            message: `${state.turn}'s turn`,
+            filter: parseText,
+            validate: validator(state),
+        },
+    ];
+    return inquirer.prompt(questions).then(answers => {
 
-    process.stdin.once('data', text => {
-
-        const input = parseText(text);
-
-        if (textIsValid(input, state) && isEmptySquare(input, state)) {
-            cb(input);
-        } else {
-            console.log(chalk.red("Invalid move, try again\n"));
-            takeInput(state, cb);
-        }
+        return answers.coord;
 
     });
+}
 
-};
+const validator = (state) => {
+    return (text) => {
 
-function textIsValid(input, state) {
-    return input.length === 2
+        if (textIsValid(text) && isEmptySquare(text, state)) {
+            return true;
+        }
+        return "Invalid move, try again."
+    }
+}
+
+const textIsValid = (input) => {
+    return (input.length === 2
         && input[0] <= config.rowSize
+        && input[0] >= 0
         && input[1] <= config.rowSize
+        && input[1] >= 0
+    )
 };
 
 const addInput = (state, input) => {
@@ -87,7 +95,7 @@ const isEmptySquare = (input, state) => {
 }
 
 const parseText = text => {
-    return text.replace(/(\r\n|\n|\r)/gm, "").split(',').reverse().map(i => parseInt(i, 10) - 1);
+    return text.split(',').map(i => parseInt(i, 10) - 1);
 }
 
 const isSolved = (board) => {
